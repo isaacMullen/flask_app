@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search</title>
+    <style>
+        /* Optional styling for hiding/showing forms */
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>Search for a Team</h1>
+    
+        <!-- Team search form -->
+    <div id="team-search" class="search-form">
+        <form action="/teams" method="GET">
+            <input type="text" name="team_name" placeholder="Enter team name">
+            <button type="submit">Search</button>
+        </form>
+        {% if teams %}
+            <table border="1">
+                <tr>
+                    {% for column in teams[0].keys() %}
+                        <th>{{ column }}</th>
+                    {% endfor %}
+                </tr>
+                {% for team in teams %}
+                <tr>
+                    {% for value in team %}
+                        <td>{{ value }}</td>
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+            </table>
+        {% elif request.args.get('team_name') %}
+            <p>Team not found.</p>
+        {% endif %}
+    </div>
+
+    <nav>
+        <button onclick="window.location.href='/players'">Search Players</button>
+    </nav>
+
+</body>
+</html>
