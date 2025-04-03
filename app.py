@@ -10,18 +10,20 @@ def get_conn():
     conn.row_factory = sqlite3.Row
     return conn
 
-items = ["Isaac", "Mike", "Jack", "Adam", "Joey"]
-
 @app.route("/")
 def index():
     connection = get_conn()
     cursor = connection.cursor()
-
-    cursor.execute('SELECT * FROM users')
-    users = cursor.fetchall()
     
-
-    connection.close()
+    try:
+        cursor.execute('SELECT * FROM users')
+        users = cursor.fetchall()
+        print(f"Users fetched: {users}")  # Log the fetched data
+    except sqlite3.Error as e:
+        print(f"Database error: {e}")  # Catch any database errors and log them
+        users = []
+    finally:
+        connection.close()
 
     return render_template("index.html", items=users)
 

@@ -7,11 +7,21 @@
 </head>
 <body>
     <h1>Users</h1>
-    <ul>
-        {% for item in items %}
-            <li>{{ item['name'] }}</li>
-            <li>{{ item['email'] }}</li>
-        {% endfor %}
-    </ul>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in items %}
+            <tr>
+                <td>{{ item['name'] }}</td>
+                <td>{{ item['email'] }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 </body>
 </html>
