@@ -3,7 +3,7 @@ import sqlite3
 
 app = Flask(__name__)
 
-items = ["Isaac", "Mike", "Jack", "Adam"]
+items = ["Isaac", "Mike", "Jack", "Adam", "Joey"]
 
 @app.route("/")
 def index():
