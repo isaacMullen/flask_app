@@ -26,7 +26,6 @@ def players():
         cursor.execute('SELECT * FROM player WHERE full_name LIKE ?', ('%' + search_query + '%',))
         players = cursor.fetchall()
 
-    player = cursor.fetchall()
     connection.close()
 
     return render_template("players.html", players=players)
@@ -36,14 +35,14 @@ def teams():
     connection = get_conn()
     cursor = connection.cursor()
     
-    search_query = request.args.get('team_name', '')
+    search_query = request.args.get('team_name', '') # gets the query parameter from URL (users search)
+    search_query_two = request.args.get('team_abbreviation', '') 
 
     teams = []
-    if search_query:
-        cursor.execute('SELECT * FROM team WHERE full_name LIKE ?', ('%' + search_query + '%',))
+    if search_query and search_query_two:
+        cursor.execute('SELECT team.full_name, team_details.abbreviation FROM team JOIN team_details ON team_id = team_details.team_id WHERE full_name LIKE ? AND team_details.abbreviation = ?', ('%' + search_query + '%', search_query_two))
         teams = cursor.fetchall()
 
-    team = cursor.fetchall()
     connection.close()
 
     return render_template("teams.html", teams=teams)
