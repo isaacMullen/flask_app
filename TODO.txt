@@ -1,0 +1,1 @@
+clean the team_details_new table. remove {la clippers: LAL} and {la lakers: LAC}
