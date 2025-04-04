@@ -39,14 +39,19 @@ def teams():
     search_query_two = request.args.get('team_abbreviation', '') 
 
     teams = []
-    if search_query and search_query_two:
-        cursor.execute('''select team.id, team.full_name, team_details.city, team_details.abbreviation, team_details.team_id
-                        from team 
-                        join team_details on team.id = team_details.team_id where team.full_name LIKE ?
-                        and team_details.abbreviation like ?''', 
-                        ('%' + search_query + '%', '%' + search_query_two + '%'))
+    if search_query:
+        query = '''select team.id, team.full_name, team_details.city, team_details.abbreviation, team_details.team_id
+                from team 
+                join team_details on team.id = team_details.team_id where team.full_name LIKE ?'''
+        params = ['%' + search_query + '%']        
+        
+        if search_query_two:
+            query += '''and team_details.abbreviation like ?'''
+            params.append('%' + search_query_two + '%')
+    
+        cursor.execute(query, params)
         teams = cursor.fetchall()
-
+    
     connection.close()
 
     return render_template("teams.html", teams=teams) 
