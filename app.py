@@ -40,12 +40,11 @@ def teams():
 
     teams = []
     if search_query and search_query_two:
-        cursor.execute('''
-        SELECT team.full_name, team_details_new.abbreviation 
-        FROM team 
-        JOIN team_details_new ON team.city = team_details_new.city 
-        WHERE team.full_name LIKE ? AND team_details_new.abbreviation LIKE ?
-        ''', ('%' + search_query + '%', '%' + search_query_two + '%'))
+        cursor.execute('''select team.id, team.full_name, team_details.city, team_details.abbreviation, team_details.team_id
+                        from team 
+                        join team_details on team.id = team_details.team_id where team.full_name LIKE ?
+                        and team_details.abbreviation like ?''', 
+                        ('%' + search_query + '%', '%' + search_query_two + '%'))
         teams = cursor.fetchall()
 
     connection.close()
