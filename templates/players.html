@@ -1,43 +1,31 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Search</title>
-</head>
-<body>
-    <h1>Search for a Player</h1>
-    
-    <!-- Player search form -->
-    <div id="player-search" class="search-form">
-        <form action="/players" method="GET">
-            <input type="text" name="player_name" placeholder="Enter player name">
-            <button type="submit">Search</button>
-        </form>
-        
-        {% if players %}
-            <table border="1">
-                <tr>
-                    {% for column in players[0].keys() %}
-                        <th>{{ column }}</th>
-                    {% endfor %}
-                </tr>
-                {% for player in players %}
-                <tr>
-                    {% for value in player %}
-                        <td>{{ value }}</td>
-                    {% endfor %}
-                </tr>
+<h1>Search for a Player</h1>
+
+<div id="player-search" class="search-form">
+    <form action="/players" method="GET">
+        <input type="text" name="player_name" placeholder="Enter player name">
+        <button type="submit">Search</button>
+    </form>
+
+    {% if players %}
+        <table border="1">
+            <tr>
+                {% for column in players[0].keys() %}
+                    <th>{{ column }}</th>
                 {% endfor %}
-            </table>
-        {% elif request.args.get('player_name') %}
-            <p>Player not found.</p>
-        {% endif %}
-    </div>
+            </tr>
+            {% for player in players %}
+            <tr>
+                {% for value in player %}
+                    <td>{{ value }}</td>
+                {% endfor %}
+            </tr>
+            {% endfor %}
+        </table>
+    {% elif request.args.get('player_name') %}
+        <p>No player found matching '{{ request.args.get('player_name') }}'.</p>
+    {% endif %}
+</div>
 
-    <nav>
-        <button onclick="window.location.href='/teams'">Search Teams</button>
-    </nav>
-
-</body>
-</html>
+<nav>
+    <button onclick="window.location.href='/teams'">Search Teams</button>
+</nav>
