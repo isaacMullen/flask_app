@@ -23,13 +23,25 @@ def players():
     cursor = connection.cursor() # initialize a cursor to execute queries
     
     search_query = request.args.get('player_name', '') # get the query parameter from the URL (if there is one)
-
     players = [] # will store the players returned by the query
+    
+    cursor.execute('SELECT full_name, * FROM common_player_info_fts')
+    all_players = cursor.fetchall()
+    
+    # ----------------------------------Blackbox Begin----------------------------------
     if search_query:
-        # if the user provided a search parameter, execute an SQL query to retrieve the players that match the query
-        cursor.execute('SELECT * FROM common_player_info_fts WHERE full_name MATCH ? OR last_name MATCH ?', (search_query, search_query))
-        players = cursor.fetchall() # storing the results inside players[]
-
+        player_names = [(player['full_name'], player) for player in all_players]
+        
+        results = process.extract(
+            search_query,   
+            [name for name, _ in player_names], 
+            scorer=fuzz.WRatio, 
+            score_cutoff=65, 
+            limit=10
+        )
+        
+        players = [next(player for name, player in player_names if name == match[0]) for match in results]
+    # ----------------------------------Blackbox End----------------------------------
         if not players:
             cursor.execute('SELECT * FROM common_player_info_fts WHERE full_name LIKE ?', ('%' + search_query + '%',))
             players = cursor.fetchall() # storing the results inside players[]

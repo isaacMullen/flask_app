@@ -1,7 +1,10 @@
 
 
 expand the common_player_info_fts table to include a lot more stats
+
 DONE ---------------------------------------------------------------------------------
+
+add fuzzy searching capabilities with rapidfuzz
 
 remake the virtual table for common_player_info_fts, include necessary columns from common_player_info table
 
