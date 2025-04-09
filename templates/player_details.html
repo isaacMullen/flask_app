@@ -1,0 +1,12 @@
+<h1>{{ player['full_name'] }} Details</h1>
+
+<ul>
+    <li>Full Name: {{ player['full_name'] }}</li>
+    <li>Team: {{ player['team'] }}</li>
+    <li>Position: {{ player['position'] }}</li>
+    <li>Height: {{ player['height'] }}</li>
+    <li>Weight: {{ player['weight'] }}</li>
+    <!-- Add more details as needed -->
+</ul>
+
+<a href="{{ url_for('players') }}">Back to Search</a>

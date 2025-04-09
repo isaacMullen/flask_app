@@ -15,6 +15,11 @@
             </tr>
             {% for player in players %}
             <tr>
+                <td>
+                    <a href="{{ url_for('player_details', player_id=player['rowid']) }}">
+                        {{ player['full_name'] }}
+                    </a>
+                </td>
                 {% for value in player %}
                     <td>{{ value }}</td>
                 {% endfor %}

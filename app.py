@@ -25,7 +25,7 @@ def players():
     search_query = request.args.get('player_name', '') # get the query parameter from the URL (if there is one)
     players = [] # will store the players returned by the query
     
-    cursor.execute('SELECT full_name, * FROM common_player_info_fts')
+    cursor.execute('SELECT rowid, full_name, * FROM common_player_info_fts')
     all_players = cursor.fetchall()
     
     # ----------------------------------Blackbox Begin----------------------------------
@@ -51,6 +51,21 @@ def players():
 
     # display the data retrieved by the query
     return render_template("players.html", players=players)
+
+@app.route("/player/<int:player_id>", methods=["GET"])
+def player_details(player_id):
+    connection = get_conn()
+    cursor = connection.cursor()
+
+    cursor.execute('SELECT rowid, * FROM common_player_info_fts WHERE rowid = ?', (player_id,))
+    player = cursor.fetchone()  
+
+    connection.close()
+
+    if player:
+        return render_template("player_details.html", player=player)
+    else:
+        return "Player not found", 404
 
 
 if __name__ == "__main__":
