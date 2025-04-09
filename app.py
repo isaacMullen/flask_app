@@ -25,7 +25,7 @@ def players():
     search_query = request.args.get('player_name', '') # get the query parameter from the URL (if there is one)
     players = [] # will store the players returned by the query
     
-    cursor.execute('SELECT rowid, full_name, * FROM common_player_info_fts')
+    cursor.execute('SELECT rowid, first_name, last_name, full_name, school, birthdate, country FROM common_player_info_fts')
     all_players = cursor.fetchall()
     
     # ----------------------------------Blackbox Begin----------------------------------
@@ -35,9 +35,9 @@ def players():
         results = process.extract(
             search_query,   
             [name for name, _ in player_names], 
-            scorer=fuzz.WRatio, 
-            score_cutoff=65, 
-            limit=10
+            scorer = fuzz.WRatio, 
+            score_cutoff = 65, 
+            limit = 10
         )
         
         players = [next(player for name, player in player_names if name == match[0]) for match in results]
@@ -57,7 +57,7 @@ def player_details(player_id):
     connection = get_conn()
     cursor = connection.cursor()
 
-    cursor.execute('SELECT rowid, * FROM common_player_info_fts WHERE rowid = ?', (player_id,))
+    cursor.execute('SELECT * FROM common_player_info_fts WHERE rowid = ?', (player_id,))
     player = cursor.fetchone()  
 
     connection.close()

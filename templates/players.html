@@ -15,13 +15,16 @@
             </tr>
             {% for player in players %}
             <tr>
-                <td>
-                    <a href="{{ url_for('player_details', player_id=player['rowid']) }}">
-                        {{ player['full_name'] }}
-                    </a>
-                </td>
-                {% for value in player %}
-                    <td>{{ value }}</td>
+                {% for column in player.keys() %}
+                    <td>
+                        {% if column == 'full_name' %}
+                            <a href="{{ url_for('player_details', player_id=player['rowid']) }}">
+                                {{ player['full_name'] }}
+                            </a>
+                        {% else %}
+                            {{ player[column] }}
+                        {% endif %}
+                    </td>
                 {% endfor %}
             </tr>
             {% endfor %}
