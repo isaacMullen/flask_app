@@ -1,7 +1,10 @@
-go through database and clean up tables (remove unused virtual tables)
+
+
+expand the common_player_info_fts table to include a lot more stats
+DONE ---------------------------------------------------------------------------------
 
 remake the virtual table for common_player_info_fts, include necessary columns from common_player_info table
 
+go through database and clean up tables (remove unused virtual tables) 
 
-DONE ---------------------------------------------------------------------------------
 clean the team_details_new table. remove {la clippers: LAL} and {la lakers: LAC}
