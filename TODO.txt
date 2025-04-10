@@ -1,4 +1,6 @@
+get data from the nba api into my player_stats_simple table
 
+repopulate team_info_common from csv
 
 expand the common_player_info_fts table to include a lot more stats
 
