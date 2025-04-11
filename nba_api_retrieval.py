@@ -53,6 +53,7 @@ def get_player_season_stats(player_id):
             })
         
         return season_data
+    
     except Exception as e:
         print(f"Error fetching stats for {player_id}: {e}")
         return []
@@ -63,7 +64,7 @@ conn.execute("PRAGMA foreign_keys = ON")
 cursor = conn.cursor()
 
 # ✅ Fetch player IDs from your existing `players` table
-cursor.execute("SELECT id FROM player LIMIT 10")  # LIMIT for testing
+cursor.execute("SELECT id FROM player")  # LIMIT for testing
 player_ids = cursor.fetchall()
 
 # Debugging: Print out the player IDs
@@ -71,23 +72,27 @@ print(f"Player IDs fetched: {player_ids}")
 
 # 🔁 Loop through and process each player
 for (player_id,) in player_ids:
+    # Check if this player already has stats in the table
+    cursor.execute('SELECT 1 FROM player_stats_simple WHERE player_id = ? LIMIT 1', (player_id,))
+    if cursor.fetchone():
+        print(f"Skipping player ID {player_id}: Data already exists.")
+        continue
+
     print(f"Processing player with ID: {player_id}")
     season_data = get_player_season_stats(player_id)
 
     if season_data:
-        # Insert the data for each season of the player
         for season in season_data:
             print(f"Inserting data for player ID {player_id}, season {season['season_id']}")
             cursor.execute('''
                 INSERT OR REPLACE INTO player_stats_simple (player_id, season_id, points_per_game, assists_per_game, rebounds_per_game)
                 VALUES (?, ?, ?, ?, ?)
             ''', (player_id, season['season_id'], season['ppg'], season['apg'], season['rpg']))
-        
         conn.commit()
     else:
         print(f"Skipping player ID {player_id}: No valid stats returned.")
     
-    time.sleep(0.6)  # Be gentle to the API
+    time.sleep(0.6)
 
 # ✅ Clean up
 conn.close()
