@@ -1,12 +1,46 @@
 <h1>{{ player['full_name'] }} Details</h1>
 
-<ul>
-    <li>Full Name: {{ player['full_name'] }}</li>
-    <li>Team: {{ player['team'] }}</li>
-    <li>Position: {{ player['position'] }}</li>
-    <li>Height: {{ player['height'] }}</li>
-    <li>Weight: {{ player['weight'] }}</li>
-    <!-- Add more details as needed -->
-</ul>
+<section>
+    <h2>Player Info</h2>
+    <table style="border-collapse: collapse; width: 100%; margin-bottom: 2em;">
+        <tr>
+            <th style="text-align: left; padding: 8px; border-bottom: 1px solid #ddd;">Field</th>
+            <th style="text-align: left; padding: 8px; border-bottom: 1px solid #ddd;">Value</th>
+        </tr>
+        <tr>
+            <td style="padding: 8px; border-bottom: 1px solid #ddd;">Full Name</td>
+            <td style="padding: 8px; border-bottom: 1px solid #ddd;">{{ player['full_name'] }}</td>
+        </tr>
+        <!-- Add more fields as needed -->
+    </table>
+</section>
 
-<a href="{{ url_for('players') }}">Back to Search</a>
+<section>
+    <h2>Season Stats</h2>
+    {% if season_stats %}
+        <table style="border-collapse: collapse; width: 100%;">
+            <thead>
+                <tr>
+                    <th style="text-align: left; padding: 8px; border-bottom: 2px solid #333;">Season</th>
+                    <th style="text-align: left; padding: 8px; border-bottom: 2px solid #333;">PPG</th>
+                    <th style="text-align: left; padding: 8px; border-bottom: 2px solid #333;">APG</th>
+                    <th style="text-align: left; padding: 8px; border-bottom: 2px solid #333;">RPG</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for season in season_stats %}
+                <tr>
+                    <td style="padding: 8px; border-bottom: 1px solid #ddd;">{{ season['season_id'] }}</td>
+                    <td style="padding: 8px; border-bottom: 1px solid #ddd;">{{ season['points_per_game']|round(1) }}</td>
+                    <td style="padding: 8px; border-bottom: 1px solid #ddd;">{{ season['assists_per_game']|round(1) }}</td>
+                    <td style="padding: 8px; border-bottom: 1px solid #ddd;">{{ season['rebounds_per_game']|round(1) }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No season stats available for this player.</p>
+    {% endif %}
+</section>
+
+<p><a href="{{ url_for('players') }}">← Back to Search</a></p>

@@ -1,35 +1,46 @@
 <h1>Search for a Player</h1>
 
-<div id="player-search" class="search-form">
-    <form action="/players" method="GET">
-        <input type="text" name="player_name" placeholder="Enter player name">
-        <button type="submit">Search</button>
+<div id="player-search" class="search-form" style="margin-bottom: 2em;">
+    <form action="/players" method="GET" style="display: flex; gap: 0.5em; align-items: center;">
+        <input type="text" name="player_name" placeholder="Enter player name" style="padding: 8px; flex: 1;">
+        <button type="submit" style="padding: 8px 12px;">Search</button>
     </form>
+</div>
 
-    {% if players %}
-        <table border="1">
+{% if players %}
+    <table style="border-collapse: collapse; width: 100%; margin-top: 1em;">
+        <thead>
             <tr>
+                <th style="text-align: left; padding: 8px; border-bottom: 2px solid #333;">Full Name</th>
                 {% for column in players[0].keys() %}
-                    <th>{{ column }}</th>
+                    {% if column != 'rowid' and column != 'full_name' %}
+                        <th style="text-align: left; padding: 8px; border-bottom: 2px solid #333;">
+                            {{ column.replace('_', ' ').title() }}
+                        </th>
+                    {% endif %}
                 {% endfor %}
             </tr>
+        </thead>
+        <tbody>
             {% for player in players %}
             <tr>
+                <td style="padding: 8px; border-bottom: 1px solid #ddd;">
+                    <a href="{{ url_for('player_details', fts_rowid=player['rowid']) }}" style="text-decoration: none; color: #007BFF;">
+                        {{ player['full_name'] }}
+                    </a>
+                </td>
                 {% for column in player.keys() %}
-                    <td>
-                        {% if column == 'full_name' %}
-                            <a href="{{ url_for('player_details', player_id=player['rowid']) }}">
-                                {{ player['full_name'] }}
-                            </a>
-                        {% else %}
+                    {% if column != 'rowid' and column != 'full_name' %}
+                        <td style="padding: 8px; border-bottom: 1px solid #ddd;">
                             {{ player[column] }}
-                        {% endif %}
-                    </td>
+                        </td>
+                    {% endif %}
                 {% endfor %}
             </tr>
             {% endfor %}
-        </table>
-    {% elif request.args.get('player_name') %}
-        <p>No player found matching '{{ request.args.get('player_name') }}'.</p>
-    {% endif %}
-</div>
+        </tbody>
+    </table>
+{% elif request.args.get('player_name') %}
+    <p>No player found matching '<strong>{{ request.args.get('player_name') }}</strong>'.</p>
+{% endif %}
+
