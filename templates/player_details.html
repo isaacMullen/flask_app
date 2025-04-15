@@ -50,6 +50,16 @@
 <hr style="margin: 3em 0; border: none; border-top: 2px solid #ccc;">
 
 <!-- YouTube Highlights -->
+<form method="get" style="margin-bottom: 2em;">
+    <label for="category">Choose video category:</label>
+    <select name="category" id="category" onchange="this.form.submit()">
+        {% for option in ['Highlights', 'Playoffs', 'Dunks', 'Interviews'] %}
+            <option value="{{ option }}" {% if selected_category == option %}selected{% endif %}>{{ option }}</option>
+        {% endfor %}
+    </select>
+    <input type="hidden" name="player_id" value="{{ player['rowid'] }}">
+</form>
+
 <section>
     <h2>YouTube Highlights</h2>
     {% if videos %}

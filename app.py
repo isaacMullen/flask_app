@@ -10,12 +10,31 @@ app = Flask(__name__)
 
 DATABASE = "nba.sqlite" # defining the path to the database file
 
-def get_top_youtube_videos(player_name, limit=10):
+import sqlite3
+
+def get_top_youtube_videos(player_id, player_name, category="", limit=10):
+    # Establish a connection to the database
+    connection = get_conn()
+    cursor = connection.cursor()
+
+    # Check if there are already videos for the player in this category
+    cursor.execute(
+        'SELECT video_id, title FROM player_videos WHERE player_id = ? AND category = ?',
+        (player_id, category)
+    )
+    existing_videos = cursor.fetchall()
+
+    if existing_videos:
+        # Return existing videos
+        print(f"Videos already exist for player ID {player_id} and category '{category}'. Skipping scraping.")
+        return [{'video_id': video['video_id'], 'title': video['title']} for video in existing_videos]
+
+    # If no videos exist for the player/category, scrape YouTube
     options = Options()
     options.add_argument("--headless")
     driver = webdriver.Chrome(options=options)
 
-    search_query = player_name
+    search_query = f"{player_name} {category}".strip()
     driver.get(f"https://www.youtube.com/results?search_query={search_query.replace(' ', '+')}")
 
     time.sleep(3)
@@ -29,13 +48,30 @@ def get_top_youtube_videos(player_name, limit=10):
 
         if url and "watch?v=" in url:
             video_id = url.split("watch?v=")[-1].split("&")[0]
-            videos.append({'title': title, 'video_id': video_id})
+            videos.append({
+                'title': title,
+                'video_id': video_id,
+                'url': f"https://www.youtube.com/watch?v={video_id}",
+                'category': category
+            })
 
         if len(videos) >= limit:
             break
 
+    # Insert the new videos into the database
+    for video in videos:
+        cursor.execute('''
+            INSERT INTO player_videos (player_id, video_id, title, url, category)
+            VALUES (?, ?, ?, ?, ?)
+        ''', (player_id, video['video_id'], video['title'], video['url'], video['category']))
+    
+    connection.commit()
     driver.quit()
+    connection.close()
+
     return videos
+
+
 
 
 def get_conn():
@@ -94,7 +130,7 @@ def player_details(fts_rowid):
     player = cursor.fetchone()
 
     if player:
-        # Get the actual player.id using full name (or better, store a mapping if possible)
+        # Get the actual player.id using full name
         cursor.execute('SELECT id FROM player WHERE full_name = ?', (player['full_name'],))
         player_id_row = cursor.fetchone()
         player_id = player_id_row['id'] if player_id_row else None
@@ -111,14 +147,25 @@ def player_details(fts_rowid):
         else:
             season_stats = []
 
+        # Get the selected category from query params (e.g., ?category=Highlights)
+        category = request.args.get("category", "").strip()
+
+        # Fetch YouTube videos based on player and category
+        videos = get_top_youtube_videos(player_id, player['full_name'], category=category)
+
         connection.close()
 
-        videos = get_top_youtube_videos(player['full_name'])
-
-        return render_template("player_details.html", player=player, season_stats=season_stats, videos=videos)
+        return render_template(
+            "player_details.html",
+            player=player,
+            season_stats=season_stats,
+            videos=videos,
+            selected_category=category  # so you can keep track of the selected one in the template
+        )
     else:
         connection.close()
         return "Player not found", 404
+
 
 
 
