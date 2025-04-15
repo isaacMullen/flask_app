@@ -6,6 +6,7 @@ __pycache__/
 *.db
 *.sqlite3
 *.sql
+scrape.py
 
 # Virtual environment
 venv/

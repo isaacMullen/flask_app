@@ -1,11 +1,12 @@
-<h1>{{ player['full_name'] }} Details</h1>
+<h1 style="margin-bottom: 1em;">{{ player['full_name'] }} Details</h1>
 
-<section>
+<!-- Player Info -->
+<section style="margin-bottom: 3em;">
     <h2>Player Info</h2>
-    <table style="border-collapse: collapse; width: 100%; margin-bottom: 2em;">
+    <table style="border-collapse: collapse; width: 100%; margin-top: 1em;">
         <tr>
-            <th style="text-align: left; padding: 8px; border-bottom: 1px solid #ddd;">Field</th>
-            <th style="text-align: left; padding: 8px; border-bottom: 1px solid #ddd;">Value</th>
+            <th style="text-align: left; padding: 8px; border-bottom: 2px solid #333;">Field</th>
+            <th style="text-align: left; padding: 8px; border-bottom: 2px solid #333;">Value</th>
         </tr>
         <tr>
             <td style="padding: 8px; border-bottom: 1px solid #ddd;">Full Name</td>
@@ -15,10 +16,13 @@
     </table>
 </section>
 
-<section>
+<hr style="margin: 3em 0; border: none; border-top: 2px solid #ccc;">
+
+<!-- Season Stats -->
+<section style="margin-bottom: 3em;">
     <h2>Season Stats</h2>
     {% if season_stats %}
-        <table style="border-collapse: collapse; width: 100%;">
+        <table style="border-collapse: collapse; width: 100%; margin-top: 1em;">
             <thead>
                 <tr>
                     <th style="text-align: left; padding: 8px; border-bottom: 2px solid #333;">Season</th>
@@ -43,4 +47,31 @@
     {% endif %}
 </section>
 
-<p><a href="{{ url_for('players') }}">← Back to Search</a></p>
+<hr style="margin: 3em 0; border: none; border-top: 2px solid #ccc;">
+
+<!-- YouTube Highlights -->
+<section>
+    <h2>YouTube Highlights</h2>
+    {% if videos %}
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 2em; margin-top: 1em;">
+        {% for video in videos %}
+        <div style="background: #f9f9f9; border-radius: 8px; padding: 1em; box-shadow: 0 2px 6px rgba(0,0,0,0.1);">
+            <iframe width="100%" height="180"
+                    src="https://www.youtube.com/embed/{{ video.video_id }}"
+                    title="{{ video.title }}"
+                    frameborder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowfullscreen>
+            </iframe>
+            <h3 style="margin: 0.5em 0 0.2em;">{{ video.title }}</h3>
+            <a href="https://www.youtube.com/watch?v={{ video.video_id }}" target="_blank" style="color: #3366cc;">Watch on YouTube</a>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+        <p>No videos found.</p>
+    {% endif %}
+</section>
+
+<!-- Back link -->
+<p style="margin-top: 3em;"><a href="{{ url_for('players') }}">← Back to Search</a></p>

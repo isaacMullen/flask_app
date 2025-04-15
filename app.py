@@ -1,10 +1,42 @@
 from rapidfuzz import fuzz, process
 from flask import Flask, render_template, request, redirect, url_for
 import sqlite3
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.chrome.options import Options
+import time
 
 app = Flask(__name__) 
 
 DATABASE = "nba.sqlite" # defining the path to the database file
+
+def get_top_youtube_videos(player_name, limit=10):
+    options = Options()
+    options.add_argument("--headless")
+    driver = webdriver.Chrome(options=options)
+
+    search_query = player_name
+    driver.get(f"https://www.youtube.com/results?search_query={search_query.replace(' ', '+')}")
+
+    time.sleep(3)
+
+    video_elements = driver.find_elements(By.ID, "video-title")
+    videos = []
+
+    for video in video_elements:
+        url = video.get_attribute("href")
+        title = video.get_attribute("title")
+
+        if url and "watch?v=" in url:
+            video_id = url.split("watch?v=")[-1].split("&")[0]
+            videos.append({'title': title, 'video_id': video_id})
+
+        if len(videos) >= limit:
+            break
+
+    driver.quit()
+    return videos
+
 
 def get_conn():
     conn = sqlite3.connect(DATABASE) # connecting to the database
@@ -43,7 +75,7 @@ def players():
         players = [next(player for name, player in player_names if name == match[0]) for match in results]
     # ----------------------------------Blackbox End----------------------------------
         if not players:
-            cursor.execute('SELECT * FROM common_player_info_fts WHERE full_name LIKE ?', ('%' + search_query + '%',))
+            cursor.execute('SELECT rowid, * FROM common_player_info_fts WHERE full_name LIKE ?', ('%' + search_query + '%',))
             players = cursor.fetchall() # storing the results inside players[]
 
 
@@ -81,7 +113,9 @@ def player_details(fts_rowid):
 
         connection.close()
 
-        return render_template("player_details.html", player=player, season_stats=season_stats)
+        videos = get_top_youtube_videos(player['full_name'])
+
+        return render_template("player_details.html", player=player, season_stats=season_stats, videos=videos)
     else:
         connection.close()
         return "Player not found", 404
